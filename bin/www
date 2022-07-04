@@ -25,7 +25,7 @@ const { Server } = require('socket.io');
 const io = new Server(server);
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('a user connected', socket.handshake.auth);
 
   socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
@@ -34,6 +34,23 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+  });
+});
+
+const nspUnauthorized = io.of('/unauthorized');
+nspUnauthorized.on('connection', (socket) => {
+  console.log('someone connected');
+  nspUnauthorized.emit('connected', 'Hello everyone!');
+
+  socket.on('join_room', (data) => {
+    console.log('join_room', data);
+    socket.join(data.room);
+    nspUnauthorized.to(data.room).emit('room_joined', data);
+  });
+
+  socket.on('send_message', (data) => {
+    console.log('send_message', data);
+    nspUnauthorized.to(data.room).emit('message_sent', data.msg);
   });
 });
 

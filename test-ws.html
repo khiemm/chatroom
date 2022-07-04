@@ -1,0 +1,40 @@
+<script src="https://cdn.socket.io/4.4.0/socket.io.min.js"
+        integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj"
+        crossorigin="anonymous"></script>
+
+<script>
+  // `http` = `ws`
+  var chat = io.connect('ws://localhost:3000/unauthorized', {
+    transports: ['websocket'],
+    auth: {
+      token:
+        'abcd',
+    },
+  });
+  chat.on('connected', function (data) {
+    console.log('connected', data);
+  });
+  chat.on('room_joined', function (data) {
+    console.log('room_joined', data);
+  });
+  chat.on('message_sent', function (data) {
+    console.log('message_sent', data);
+  });
+</script>
+
+<script>
+  function joinRoom() {
+    console.log('click join room');
+    chat.emit('join_room', { room: 'room1' });
+  }
+
+  function sendMessage() {
+    console.log('click send message');
+    chat.emit('send_message', { room: 'room1', msg: 'msg1' });
+  }
+</script>
+
+<h5>Test websocket</h5>
+
+<button onclick="joinRoom()">Join room</button>
+<button onclick="sendMessage()">Send message</button>
